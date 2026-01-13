@@ -206,6 +206,9 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📁 User data will be saved to: ${USER_DATA_FILE}`);
   console.log(`🌐 Open http://localhost:${PORT} to test`);
+  console.log(`🔧 Admin Panel: http://localhost:${PORT}/admin`);
+  console.log(`📝 Login Page: http://localhost:${PORT}`);
+  console.log('⚡ Server is ready for user data collection!');
 });
 
 module.exports = app;

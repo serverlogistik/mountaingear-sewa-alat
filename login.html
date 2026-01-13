@@ -204,8 +204,11 @@
                 if (data.success) {
                     console.log('✅ User data saved to server successfully');
                     console.log('📊 Total users:', data.user_count);
+                    // Show success message
+                    showNotification('Login data saved successfully!', 'success');
                 } else {
                     console.error('❌ Failed to save user data:', data.message);
+                    showNotification('Failed to save user data', 'error');
                 }
             })
             .catch(error => {
@@ -213,7 +216,37 @@
                 console.log('🔄 Using localStorage fallback...');
                 // Fallback to localStorage if server fails
                 saveToLocalStorage(loginData);
+                showNotification('Server error, using local storage', 'warning');
             });
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
+                type === 'success' ? 'bg-green-500 text-white' :
+                type === 'error' ? 'bg-red-500 text-white' :
+                type === 'warning' ? 'bg-yellow-500 text-white' :
+                'bg-blue-500 text-white'
+            }`;
+            notification.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-${
+                        type === 'success' ? 'check-circle' :
+                        type === 'error' ? 'exclamation-circle' :
+                        type === 'warning' ? 'exclamation-triangle' :
+                        'info-circle'
+                    }"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
         }
 
         // Fallback to localStorage
