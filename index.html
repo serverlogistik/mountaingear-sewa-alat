@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MountainGear - Sewa Alat Pendakian Profesional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(34, 193, 195, 0.9), rgba(253, 187, 45, 0.9));
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .scroll-smooth {
+            scroll-behavior: smooth;
+        }
+        .user-dropdown {
+            display: none;
+        }
+        .user-dropdown.show {
+            display: block;
+        }
+    </style>
+</head>
+<body class="scroll-smooth">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white shadow-lg z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-mountain text-green-600 text-2xl"></i>
+                    <span class="font-bold text-xl text-gray-800">MountainGear</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#home" class="text-gray-700 hover:text-green-600 transition">Beranda</a>
+                    <a href="#equipment" class="text-gray-700 hover:text-green-600 transition">Peralatan</a>
+                    <a href="#booking" class="text-gray-700 hover:text-green-600 transition">Sewa</a>
+                    <a href="#tips" class="text-gray-700 hover:text-green-600 transition">Tips</a>
+                    <a href="#contact" class="text-gray-700 hover:text-green-600 transition">Kontak</a>
+                    
+                    <!-- User Profile -->
+                    <div class="relative">
+                        <button id="userMenuBtn" class="flex items-center space-x-2 text-gray-700 hover:text-green-600 transition">
+                            <img id="userAvatar" src="https://picsum.photos/seed/user123/32/32.jpg" alt="User" class="w-8 h-8 rounded-full">
+                            <span id="userName" class="font-medium">User</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="userDropdown" class="user-dropdown absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border">
+                            <div class="p-3 border-b">
+                                <p class="text-sm font-semibold text-gray-800" id="dropdownUserName">User Name</p>
+                                <p class="text-xs text-gray-500" id="dropdownUserHandle">@username</p>
+                            </div>
+                            <div class="py-2">
+                                <a href="#orders" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-shopping-bag mr-2"></i>Riwayat Pesanan
+                                </a>
+                                <a href="#profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i>Profil Saya
+                                </a>
+                                <button id="logoutBtn" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="mobileMenuBtn" class="md:hidden">
+                    <i class="fas fa-bars text-gray-700 text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-t">
+            <div class="px-4 py-2 space-y-2">
+                <a href="#home" class="block py-2 text-gray-700 hover:text-green-600">Beranda</a>
+                <a href="#equipment" class="block py-2 text-gray-700 hover:text-green-600">Peralatan</a>
+                <a href="#booking" class="block py-2 text-gray-700 hover:text-green-600">Sewa</a>
+                <a href="#tips" class="block py-2 text-gray-700 hover:text-green-600">Tips</a>
+                <a href="#contact" class="block py-2 text-gray-700 hover:text-green-600">Kontak</a>
+                
+                <!-- Mobile User Profile -->
+                <div class="border-t pt-2 mt-2">
+                    <div class="flex items-center space-x-3 py-2">
+                        <img id="mobileUserAvatar" src="https://picsum.photos/seed/user123/40/40.jpg" alt="User" class="w-10 h-10 rounded-full">
+                        <div>
+                            <p class="font-medium text-gray-800" id="mobileUserName">User</p>
+                            <p class="text-xs text-gray-500" id="mobileUserHandle">@username</p>
+                        </div>
+                    </div>
+                    <button id="mobileLogoutBtn" class="w-full text-left py-2 text-red-600 hover:bg-gray-100">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0">
+            <img src="https://images.unsplash.com/photo-1464822759844-d150baec0494?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" 
+                 alt="Mountain Landscape" class="w-full h-full object-cover">
+            <div class="hero-gradient absolute inset-0"></div>
+        </div>
+        <div class="relative z-10 text-center text-white px-4">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Sewa Alat Pendakian Profesional</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">Peralatan berkualitas tinggi untuk petualangan pendakian Anda yang aman dan nyaman</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#equipment" class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition transform hover:scale-105">
+                    Lihat Peralatan
+                </a>
+                <a href="#booking" class="bg-white text-green-600 hover:bg-gray-100 px-8 py-3 rounded-lg font-semibold transition transform hover:scale-105">
+                    Sewa Sekarang
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Equipment Section -->
+    <section id="equipment" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Peralatan Pendakian</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Koleksi peralatan pendakian lengkap dan berkualitas untuk berbagai jenis medan</p>
+            </div>
+
+            <!-- Equipment Categories -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <button class="category-btn bg-green-600 text-white px-6 py-2 rounded-full" data-category="all">Semua</button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-green-600 hover:text-white transition" data-category="carrying">Pembawaan</button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-green-600 hover:text-white transition" data-category="clothing">Pakaian</button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-green-600 hover:text-white transition" data-category="safety">Keselamatan</button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-green-600 hover:text-white transition" data-category="camping">Kemah</button>
+            </div>
+
+            <!-- Equipment Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Carrier -->
+                <div class="equipment-card card-hover bg-white rounded-lg overflow-hidden shadow-lg" data-category="carrying">
+                    <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                         alt="Carrier" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">Carrier 60L</h3>
+                        <p class="text-gray-600 text-sm mb-3">Carrier kapasitas 60L dengan sistem pendingin punggung</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-bold">Rp 50.000/hari</span>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sleeping Bag -->
+                <div class="equipment-card card-hover bg-white rounded-lg overflow-hidden shadow-lg" data-category="camping">
+                    <img src="https://images.unsplash.com/photo-1594212696528-2fadb1b5d030?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                         alt="Sleeping Bag" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">Sleeping Bag</h3>
+                        <p class="text-gray-600 text-sm mb-3">Kantong tidur waterproof untuk suhu hingga -5°C</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-bold">Rp 35.000/hari</span>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tent -->
+                <div class="equipment-card card-hover bg-white rounded-lg overflow-hidden shadow-lg" data-category="camping">
+                    <img src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                         alt="Tent" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">Tent 2-3 Person</h3>
+                        <p class="text-gray-600 text-sm mb-3">Tenda waterproof kapasitas 2-3 orang</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-bold">Rp 75.000/hari</span>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hiking Boots -->
+                <div class="equipment-card card-hover bg-white rounded-lg overflow-hidden shadow-lg" data-category="clothing">
+                    <img src="https://images.unsplash.com/photo-1543508282-6319a3e2621f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                         alt="Hiking Boots" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">Sepatu Gunung</h3>
+                        <p class="text-gray-600 text-sm mb-3">Sepatu hiking waterproof size 39-44</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-bold">Rp 40.000/hari</span>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Headlamp -->
+                <div class="equipment-card card-hover bg-white rounded-lg overflow-hidden shadow-lg" data-category="safety">
+                    <img src="https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                         alt="Headlamp" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">Headlamp LED</h3>
+                        <p class="text-gray-600 text-sm mb-3">Senter kepala LED 300 lumens waterproof</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-bold">Rp 25.000/hari</span>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trekking Pole -->
+                <div class="equipment-card card-hover bg-white rounded-lg overflow-hidden shadow-lg" data-category="carrying">
+                    <img src="https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                         alt="Trekking Pole" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">Trekking Pole</h3>
+                        <p class="text-gray-600 text-sm mb-3">Tongkat pendakian aluminium adjustable</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-bold">Rp 30.000/hari</span>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jacket -->
+                <div class="equipment-card card-hover bg-white rounded-lg overflow-hidden shadow-lg" data-category="clothing">
+                    <img src="https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                         alt="Jacket" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">Jacket Waterproof</h3>
+                        <p class="text-gray-600 text-sm mb-3">Jaket gunung waterproof windbreaker</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-bold">Rp 45.000/hari</span>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cooking Set -->
+                <div class="equipment-card card-hover bg-white rounded-lg overflow-hidden shadow-lg" data-category="camping">
+                    <img src="https://images.unsplash.com/photo-1494537176433-7a3c4ef2046f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" 
+                         alt="Cooking Set" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-2">Cooking Set</h3>
+                        <p class="text-gray-600 text-sm mb-3">Kompor dan peralatan masak portable</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-bold">Rp 55.000/hari</span>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section id="booking" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Form Pemesanan</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Isi form berikut untuk memesan peralatan pendakian</p>
+            </div>
+
+            <div class="max-w-2xl mx-auto">
+                <form id="bookingForm" class="bg-gray-50 p-8 rounded-lg shadow-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Nama Lengkap</label>
+                            <input type="text" id="fullName" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">No. Telepon</label>
+                            <input type="tel" id="phone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Email</label>
+                            <input type="email" id="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Tanggal Mulai</label>
+                            <input type="date" id="startDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Tanggal Selesai</label>
+                            <input type="date" id="endDate" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Tujuan Pendakian</label>
+                            <input type="text" id="destination" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500">
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <label class="block text-gray-700 font-semibold mb-2">Peralatan yang Dipesan</label>
+                        <div id="selectedItems" class="bg-white p-4 rounded-lg border border-gray-300 min-h-[100px]">
+                            <p class="text-gray-500 text-center">Pilih peralatan dari katalog di atas</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <label class="block text-gray-700 font-semibold mb-2">Catatan Tambahan</label>
+                        <textarea id="notes" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-500"></textarea>
+                    </div>
+
+                    <div class="mt-8">
+                        <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition">
+                            Kirim Pemesanan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tips Section -->
+    <section id="tips" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Tips Pendakian</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Panduan lengkap untuk pendakian yang aman dan menyenangkan</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="text-green-600 text-3xl mb-4">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-3">Perencanaan Rute</h3>
+                    <p class="text-gray-600">Studi rute dengan baik, perhatikan kondisi cuaca, dan beri tahu orang lain tentang rencana pendakian Anda.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="text-green-600 text-3xl mb-4">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-3">Kesehatan Fisik</h3>
+                    <p class="text-gray-600">Pastikan kondisi fisik prima, lakukan pemanasan sebelum pendakian, dan bawa obat-obatan pribadi.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="text-green-600 text-3xl mb-4">
+                        <i class="fas fa-tint"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-3">Hidrasi & Nutrisi</h3>
+                    <p class="text-gray-600">Bawa air cukup (minimal 3L per hari), makanan ringan bernutrisi, dan jaga asupan kalori.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="text-green-600 text-3xl mb-4">
+                        <i class="fas fa-cloud-sun"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-3">Cuaca & Waktu</h3>
+                    <p class="text-gray-600">Periksa prakiraan cuaca, mulai pendakian pagi hari, dan siapkan rencana darurat jika cuaca buruk.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="text-green-600 text-3xl mb-4">
+                        <i class="fas fa-first-aid"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-3">P3K & Keselamatan</h3>
+                    <p class="text-gray-600">Bawa P3K lengkap, pelajari teknik pertolongan pertama, dan kenali tanda-tanda hipotermia.</p>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-lg">
+                    <div class="text-green-600 text-3xl mb-4">
+                        <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-3">Leave No Trace</h3>
+                    <p class="text-gray-600">Bawa kembali semua sampah, jangan merusak alam, dan hormati ekosistem lokal.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Hubungi Kami</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Siap membantu Anda mempersiapkan petualangan pendakian</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div class="text-center">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-map-marker-alt text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Alamat</h3>
+                    <p class="text-gray-600">Jl. Gunung Merapi No. 45<br>Yogyakarta 55281</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-phone text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Telepon</h3>
+                    <p class="text-gray-600">+62 812-3456-7890<br>+62 274-123456</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-envelope text-green-600 text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Email</h3>
+                    <p class="text-gray-600">info@mountaingear.id<br>support@mountaingear.id</p>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <div class="flex justify-center space-x-6">
+                    <a href="#" class="text-gray-600 hover:text-green-600 transition">
+                        <i class="fab fa-facebook text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-green-600 transition">
+                        <i class="fab fa-instagram text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-green-600 transition">
+                        <i class="fab fa-twitter text-2xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-600 hover:text-green-600 transition">
+                        <i class="fab fa-youtube text-2xl"></i>
+                </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-2 mb-4 md:mb-0">
+                    <i class="fas fa-mountain text-green-400 text-xl"></i>
+                    <span class="font-bold">MountainGear</span>
+                </div>
+                <p class="text-gray-400 text-center md:text-right">
+                    &copy; 2024 MountainGear. All rights reserved. | Sewa Alat Pendakian Profesional
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg max-w-md mx-4">
+            <div class="text-center">
+                <div class="text-green-600 text-5xl mb-4">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 class="font-bold text-xl mb-2">Pemesanan Berhasil!</h3>
+                <p class="text-gray-600 mb-6">Terima kasih telah memesan. Kami akan segera menghubungi Anda untuk konfirmasi.</p>
+                <button onclick="closeModal()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Authentication Check
+        function checkAuthentication() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const userData = localStorage.getItem('instagramUser');
+            
+            if (!isLoggedIn || isLoggedIn !== 'true' || !userData) {
+                // Redirect to login page
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            // Parse user data and update UI
+            const user = JSON.parse(userData);
+            updateUserInterface(user);
+            return true;
+        }
+
+        // Update User Interface
+        function updateUserInterface(user) {
+            // Update desktop navigation
+            document.getElementById('userName').textContent = user.full_name || user.username;
+            document.getElementById('userAvatar').src = user.profile_picture || `https://picsum.photos/seed/${user.username}/32/32.jpg`;
+            document.getElementById('dropdownUserName').textContent = user.full_name || user.username;
+            document.getElementById('dropdownUserHandle').textContent = '@' + user.username;
+            
+            // Update mobile navigation
+            document.getElementById('mobileUserName').textContent = user.full_name || user.username;
+            document.getElementById('mobileUserAvatar').src = user.profile_picture || `https://picsum.photos/seed/${user.username}/40/40.jpg`;
+            document.getElementById('mobileUserHandle').textContent = '@' + user.username;
+        }
+
+        // Logout Function
+        function logout() {
+            localStorage.removeItem('instagramUser');
+            localStorage.removeItem('isLoggedIn');
+            window.location.href = 'login.html';
+        }
+
+        // Check authentication on page load
+        window.addEventListener('load', () => {
+            if (!checkAuthentication()) {
+                return;
+            }
+        });
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // User Dropdown Toggle
+        const userMenuBtn = document.getElementById('userMenuBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        userMenuBtn.addEventListener('click', () => {
+            userDropdown.classList.toggle('show');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('show');
+            }
+        });
+
+        // Logout buttons
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.getElementById('mobileLogoutBtn').addEventListener('click', logout);
+
+        // Equipment Category Filter
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const equipmentCards = document.querySelectorAll('.equipment-card');
+        
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const category = btn.dataset.category;
+                
+                // Update button styles
+                categoryBtns.forEach(b => {
+                    b.classList.remove('bg-green-600', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                btn.classList.remove('bg-gray-200', 'text-gray-700');
+                btn.classList.add('bg-green-600', 'text-white');
+                
+                // Filter cards
+                equipmentCards.forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Cart functionality
+        let selectedItems = [];
+        const selectedItemsDiv = document.getElementById('selectedItems');
+        
+        document.querySelectorAll('.equipment-card button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.equipment-card');
+                const name = card.querySelector('h3').textContent;
+                const price = card.querySelector('.text-green-600').textContent;
+                
+                // Add to cart
+                selectedItems.push({ name, price });
+                updateSelectedItems();
+                
+                // Visual feedback
+                this.innerHTML = '<i class="fas fa-check"></i>';
+                this.classList.remove('bg-green-600');
+                this.classList.add('bg-gray-400');
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-plus"></i>';
+                    this.classList.remove('bg-gray-400');
+                    this.classList.add('bg-green-600');
+                }, 1000);
+            });
+        });
+        
+        function updateSelectedItems() {
+            if (selectedItems.length === 0) {
+                selectedItemsDiv.innerHTML = '<p class="text-gray-500 text-center">Pilih peralatan dari katalog di atas</p>';
+            } else {
+                selectedItemsDiv.innerHTML = selectedItems.map((item, index) => `
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <span>${item.name}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-600 font-semibold">${item.price}</span>
+                            <button onclick="removeItem(${index})" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function removeItem(index) {
+            selectedItems.splice(index, 1);
+            updateSelectedItems();
+        }
+
+        // Form Submission
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate selected items
+            if (selectedItems.length === 0) {
+                alert('Silakan pilih minimal satu peralatan');
+                return;
+            }
+            
+            // Get user data for order
+            const userData = JSON.parse(localStorage.getItem('instagramUser'));
+            
+            // Create order object
+            const order = {
+                user: userData,
+                items: selectedItems,
+                formData: {
+                    fullName: document.getElementById('fullName').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value,
+                    startDate: document.getElementById('startDate').value,
+                    endDate: document.getElementById('endDate').value,
+                    destination: document.getElementById('destination').value,
+                    notes: document.getElementById('notes').value
+                },
+                timestamp: new Date().toISOString()
+            };
+            
+            // Save order to localStorage (in real app, send to server)
+            let orders = JSON.parse(localStorage.getItem('userOrders') || '[]');
+            orders.push(order);
+            localStorage.setItem('userOrders', JSON.stringify(orders));
+            
+            // Show success modal
+            document.getElementById('successModal').classList.remove('hidden');
+            
+            // Reset form
+            this.reset();
+            selectedItems = [];
+            updateSelectedItems();
+        });
+        
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // Close mobile menu if open
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startDate').setAttribute('min', today);
+        document.getElementById('endDate').setAttribute('min', today);
+        
+        // Update end date minimum when start date changes
+        document.getElementById('startDate').addEventListener('change', function() {
+            document.getElementById('endDate').setAttribute('min', this.value);
+        });
+    </script>
+</body>
+</html>
