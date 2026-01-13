@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Vercel API</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-bold mb-4">🔍 Debug Vercel API</h1>
+        
+        <div class="space-y-4">
+            <!-- Test API Connection -->
+            <div class="border rounded-lg p-4">
+                <h2 class="font-bold mb-2">1. Test API Connection</h2>
+                <button onclick="testHealth()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    🏥 Test Health Endpoint
+                </button>
+                <div id="healthResult" class="mt-2 text-sm"></div>
+            </div>
+
+            <!-- Test Login API -->
+            <div class="border rounded-lg p-4">
+                <h2 class="font-bold mb-2">2. Test Login API</h2>
+                <input type="text" id="testUsername" placeholder="Username" class="w-full px-3 py-2 border rounded mb-2">
+                <input type="password" id="testPassword" placeholder="Password" class="w-full px-3 py-2 border rounded mb-2">
+                <button onclick="testLogin()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    🔑 Test Login API
+                </button>
+                <div id="loginResult" class="mt-2 text-sm"></div>
+            </div>
+
+            <!-- Get All Users -->
+            <div class="border rounded-lg p-4">
+                <h2 class="font-bold mb-2">3. Get All Users</h2>
+                <button onclick="getUsers()" class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+                    👥 Get All Users
+                </button>
+                <div id="usersResult" class="mt-2 text-sm"></div>
+            </div>
+
+            <!-- Clear Data -->
+            <div class="border rounded-lg p-4">
+                <h2 class="font-bold mb-2">4. Clear All Data</h2>
+                <button onclick="clearData()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    🗑️ Clear All Data
+                </button>
+                <div id="clearResult" class="mt-2 text-sm"></div>
+            </div>
+        </div>
+
+        <!-- Raw Response -->
+        <div class="border rounded-lg p-4">
+            <h2 class="font-bold mb-2">📋 Last Response</h2>
+            <pre id="lastResponse" class="bg-gray-100 p-2 rounded text-xs overflow-x-auto"></pre>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://track-senpi-g814p1090-serverlogistiks-projects.vercel.app';
+
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                const data = await response.json();
+                
+                document.getElementById('healthResult').innerHTML = `
+                    <div class="text-green-600">
+                        ✅ Health: ${data.status}<br>
+                        👥 Users: ${data.users_count}<br>
+                        🌐 Environment: ${data.environment}<br>
+                        ⏰ Time: ${data.timestamp}
+                    </div>
+                `;
+                
+                updateLastResponse(data);
+            } catch (error) {
+                document.getElementById('healthResult').innerHTML = `
+                    <div class="text-red-600">❌ Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function testLogin() {
+            const username = document.getElementById('testUsername').value;
+            const password = document.getElementById('testPassword').value;
+            
+            if (!username || !password) {
+                document.getElementById('loginResult').innerHTML = '<div class="text-yellow-600">⚠️ Masukkan username dan password</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        login_method: 'manual',
+                        user_agent: navigator.userAgent
+                    })
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('loginResult').innerHTML = `
+                    <div class="text-green-600">
+                        ✅ Login Success!<br>
+                        📊 Total Users: ${data.user_count}<br>
+                        💾 Stored: ${JSON.stringify(data.stored_data, null, 2)}
+                    </div>
+                `;
+                
+                updateLastResponse(data);
+                
+                // Auto refresh users after successful login
+                setTimeout(getUsers, 1000);
+                
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = `
+                    <div class="text-red-600">❌ Login Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function getUsers() {
+            try {
+                const response = await fetch(`${API_BASE}/api/users`);
+                const data = await response.json();
+                
+                document.getElementById('usersResult').innerHTML = `
+                    <div class="text-blue-600">
+                        ✅ Users Retrieved!<br>
+                        👥 Total: ${data.users.length}<br>
+                        📊 Data: ${JSON.stringify(data.users, null, 2)}
+                    </div>
+                `;
+                
+                updateLastResponse(data);
+                
+            } catch (error) {
+                document.getElementById('usersResult').innerHTML = `
+                    <div class="text-red-600">❌ Get Users Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        async function clearData() {
+            if (!confirm('Yakin ingin menghapus semua data?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/clear-data`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('clearResult').innerHTML = `
+                    <div class="text-green-600">
+                        ✅ Data Cleared!<br>
+                        📝 Message: ${data.message}
+                    </div>
+                `;
+                
+                updateLastResponse(data);
+                
+                // Auto refresh users after clearing
+                setTimeout(getUsers, 1000);
+                
+            } catch (error) {
+                document.getElementById('clearResult').innerHTML = `
+                    <div class="text-red-600">❌ Clear Error: ${error.message}</div>
+                `;
+            }
+        }
+
+        function updateLastResponse(data) {
+            document.getElementById('lastResponse').textContent = JSON.stringify(data, null, 2);
+        }
+
+        // Auto test health on load
+        window.addEventListener('load', testHealth);
+    </script>
+</body>
+</html>
